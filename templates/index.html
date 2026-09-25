@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Criador de Documentos</title>
+</head>
+
+<body>
+
+    <h1>Criar modelo de documento</h1>
+
+    <label>Nome do modelo</label>
+
+    <br>
+
+    <input
+        type="text"
+        id="nome-modelo"
+        placeholder="Ex: Cadastro de Cliente"
+    >
+
+    <h2>Campos</h2>
+
+    <div id="campos"></div>
+
+    <br>
+
+    <button onclick="adicionarCampo()">
+        + Adicionar campo
+    </button>
+
+    <br><br>
+
+    <button onclick="salvarModelo()">
+        Salvar modelo
+    </button>
+
+    <p id="resultado"></p>
+
+    <script src="/static/script.js"></script>
+
+</body>
+
+</html>
