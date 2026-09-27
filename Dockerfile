@@ -13,8 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Expõe a porta do Flask
 EXPOSE 5000
 
-# Executa o servidor Flask
-CMD ["python", "app.py"]
+CMD ["python", "controller/app.py"]
