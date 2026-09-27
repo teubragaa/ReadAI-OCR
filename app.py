@@ -12,55 +12,44 @@ def inicio():
 
 
 @app.post("/api/modelos")
-def criar_modelo():
-    
+def processar_documento():
     arquivo = request.files.get("documento")
+
     if not arquivo:
         return jsonify({"mensagem": "Nenhum arquivo enviado"}), 400
 
-    
     nome = request.form.get("nome", "Documento")
-    campos_raw = request.form.get("campos", "[]")
-    campos = json.loads(campos_raw)
+    campos = json.loads(request.form.get("campos", "[]"))
 
     if not campos:
         return jsonify({"mensagem": "Adicione pelo menos um campo"}), 400
 
-    try:
-        imagem = Image.open(arquivo.stream)
-        
-        # Pytesseract processa a imagem dentro do container
-        texto_bruto = pytesseract.image_to_string(imagem, lang="por")
+    imagem = Image.open(arquivo.stream)
+    texto = pytesseract.image_to_string(imagem, lang="por")
 
-        if not texto_bruto.strip():
-            return jsonify({
-                "mensagem": "Não foi possível extrair texto da imagem via OCR local."
-            }), 400
-    
-        linhas = texto_bruto.split("\n")
-        dados_extraidos = {}
+    if not texto.strip():
+        return jsonify({"mensagem": "Não foi possível ler o documento"}), 400
 
-        for campo in campos:
-            nome_campo = campo["nome"]
-            valor_encontrado = "Não encontrado"
-            
-            for linha in linhas:
-                if nome_campo.lower() in linha.lower():
-                    valor_encontrado = linha.strip()
-                    break
-            
-            dados_extraidos[nome_campo] = valor_encontrado
+    dados = {}
 
-        return jsonify({
-            "mensagem": "Documento processado 100% offline via OCR local!",
-            "modelo": {"nome": nome, "campos": campos},
-            "texto_bruto_ocr": texto_bruto,
-            "dados": dados_extraidos
-        })
+    for campo in campos:
+        nome_campo = campo["nome"]
+        dados[nome_campo] = "Não encontrado"
 
-    except Exception as e:
-        return jsonify({"mensagem": f"Erro no processamento interno: {str(e)}"}), 500
+        for linha in texto.splitlines():
+            if nome_campo.lower() in linha.lower():
+                dados[nome_campo] = linha.strip()
+                break
 
+    return jsonify({
+        "mensagem": "Documento processado com sucesso",
+        "modelo": {
+            "nome": nome,
+            "campos": campos
+        },
+        "texto": texto,
+        "dados": dados
+    })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
