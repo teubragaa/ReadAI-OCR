@@ -1,1 +1,3 @@
 Flask
+pytesseract>=0.3.10
+pillow>=10.0.0
